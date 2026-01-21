@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FloodGuard Kerala</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Login Container -->
+    <div id="loginContainer">
+      <h2>Login to FloodGuard Kerala</h2>
+      <input id="phone" type="text" placeholder="Enter Phone Number" />
+      <button onclick="login()">Login</button>
+      <div id="loginError"></div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" style="display: none;">
+      <header>
+        <h1>FloodGuard Kerala</h1>
+        <p>Smart Flood Detection & Alert System</p>
+      </header>
+
+      <nav class="breadcrumb">
+        Home > <span id="breadcrumbDistrict">-</span> > <span id="breadcrumbMandal">-</span> > <span id="breadcrumbVillage">-</span>
+      </nav>
+
+      <div class="dashboard">
+
+        <!-- Location Selector -->
+        <div class="card location-panel">
+          <h2>Location Selector</h2>
+          <select id="districtSelect" onchange="populateMandals()">
+            <option value="">Select District</option>
+          </select>
+          <select id="mandalSelect" onchange="populateVillages()">
+            <option value="">Select Mandal</option>
+          </select>
+          <select id="villageSelect" onchange="updateBreadcrumbs()">
+            <option value="">Select Village</option>
+          </select>
+        </div>
+
+        <!-- Water Level Simulator -->
+        <div class="card simulator-panel">
+          <h2>Water Level Simulator</h2>
+          <input type="range" id="waterSlider" min="0" max="500" value="0" disabled />
+          <div class="gauge">
+            <div id="gaugeFill" class="gauge-fill"></div>
+          </div>
+          <p>Water Level: <span id="waterValue">0</span> cm</p>
+          <div id="statusIndicator">Status: Safe</div>
+          <button class="simulator-toggle" id="simulatorToggleBtn" onclick="toggleSimulation(this)">Start Simulator</button>
+
+          <!-- Alert Sounds -->
+          <audio id="alertSound" src="alert.mp3" preload="auto"></audio>
+          <audio id="dangerSound" src="danger.mp3" preload="auto"></audio>
+        </div>
+
+        <!-- Alert Log -->
+        <div class="card alert-panel">
+          <h2>Real-Time Alerts</h2>
+          <div id="alertLog"></div>
+        </div>
+
+        <!-- Safe Locations -->
+        <div class="card safe-panel">
+          <h2>Nearby Safe Locations</h2>
+          <ul id="safeLocations">
+            <li>Relief Camp A - 2.1 km</li>
+            <li>Community Hall B - 4.7 km</li>
+            <li>Govt School Shelter C - 5.9 km</li>
+          </ul>
+        </div>
+
+        <!-- Map Panel -->
+        <div class="card map-panel">
+          <h2>Kerala District Map</h2>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Kerala_District_map.svg" alt="Kerala Map" onclick="openMapZoom()" />
+        </div>
+
+        <!-- About Section -->
+        <div class="card about-panel">
+          <h2>About This Website</h2>
+          <p>This website helps citizens monitor flood levels and alerts in real time across Kerala. Use the location selector to simulate alerts, view water levels, and find safe shelters nearby.</p>
+        </div>
+      </div>
+
+      <!-- Map Modal Zoom -->
+      <div id="mapModal" class="modal">
+        <span class="close" onclick="closeMapZoom()">&times;</span>
+        <img class="modal-content" id="mapZoomed" />
+      </div>
+
+      <footer>
+        <p>&copy; 2025 FloodGuard Kerala. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
