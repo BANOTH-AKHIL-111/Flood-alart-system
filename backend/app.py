@@ -2,6 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import bcrypt, random
 from db import conn, cursor
+@app.route("/test-db")
+def test_db():
+    try:
+        cursor.execute("SELECT 1")
+        return {"status": "success", "message": "Database connected"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500
+
 
 app = Flask(__name__)
 CORS(app)
