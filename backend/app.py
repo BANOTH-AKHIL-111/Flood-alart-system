@@ -2,13 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import bcrypt, random
 from db import conn, cursor
-@app.route("/test-db")
-def test_db():
-    try:
-        cursor.execute("SELECT 1")
-        return {"status": "success", "message": "Database connected"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}, 500
 
 
 app = Flask(__name__)
@@ -97,6 +90,19 @@ def login():
 def home():
     return "Flood Alert System Backend Running"
 
+@app.route("/test-db")
+def test_db():
+    try:
+        cursor.execute("SELECT 1")
+        return jsonify({
+            "status": "success",
+            "message": "Database connected successfully"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 if __name__ == "__main__":
     app.run()
