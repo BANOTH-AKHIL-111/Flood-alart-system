@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Flood Alert System</title>
+</head>
 <body>
-<h2>Flood Alert Login</h2>
 
-<input id="phone" placeholder="Phone">
-<input id="password" type="password" placeholder="Password">
-<button onclick="signup()">Signup</button>
+<div id="loginContainer">
+  <h2>Login / Signup</h2>
+  <input id="phone" placeholder="Phone Number"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Signup</button>
+</div>
 
-<br><br>
-<input id="otp" placeholder="OTP">
-<button onclick="verifyOtp()">Verify OTP</button>
-
-<br><br>
-<button onclick="login()">Login</button>
-
-<p id="msg"></p>
+<div id="mainApp" style="display:none;">
+  <h2>Flood Alert Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
 
 <script src="script.js"></script>
 </body>

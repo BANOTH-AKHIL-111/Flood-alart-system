@@ -1,40 +1,53 @@
-const API = "https://flood-alert-api.onrender.com";
+const BASE_URL = "https://flood-alert-system.onrender.com";
 
-function signup() {
-  fetch(API + "/signup", {
+// LOGIN
+async function login() {
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!/^\d{10}$/.test(phone)) {
+    alert("Enter valid 10-digit phone number");
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/login`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      phone: phone.value,
-      password: password.value
-    })
-  })
-  .then(res => res.json())
-  .then(data => msg.innerText = data.message || data.error);
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone, password })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert("Login successful");
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+  } else {
+    alert(data.message);
+  }
 }
 
-function verifyOtp() {
-  fetch(API + "/verify-otp", {
+// SIGNUP
+async function signup() {
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!/^\d{10}$/.test(phone)) {
+    alert("Enter valid phone number");
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/signup`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      phone: phone.value,
-      otp: otp.value
-    })
-  })
-  .then(res => res.json())
-  .then(data => msg.innerText = data.message || data.error);
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone, password })
+  });
+
+  const data = await res.json();
+  alert(data.message);
 }
 
-function login() {
-  fetch(API + "/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      phone: phone.value,
-      password: password.value
-    })
-  })
-  .then(res => res.json())
-  .then(data => msg.innerText = data.message || data.error);
+// LOGOUT
+function logout() {
+  location.reload();
 }
