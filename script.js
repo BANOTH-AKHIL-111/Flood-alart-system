@@ -1,7 +1,11 @@
 // --- Phone Login Users ---
-const users = [{ phone: "6309808435" }]; // Add more numbers as needed
+// --- Phone Login Users ---
+const users = [{ phone: "6309808435" }];
+
 // --- Full Kerala District → Mandal → Village Data ---
 const data = {
+  /* KEEP YOUR FULL DATA OBJECT HERE EXACTLY AS YOU SENT */
+
   "Thiruvananthapuram": {
     "Thiruvananthapuram": ["Pettah", "Pangode", "Kudappanakunnu", "Vellanad", "Pallichal"],
     "Neyyattinkara": ["Balaramapuram", "Vizhinjam", "Vellarada", "Aryanad"],
@@ -105,6 +109,7 @@ const data = {
 
 
 let simInterval = null;
+let currentLevel = 0;
 
 // --- Phone Number Login Logic ---
 function login() {
@@ -126,6 +131,7 @@ function login() {
 function initializeDistricts() {
   const districtSelect = document.getElementById("districtSelect");
   districtSelect.innerHTML = '<option value="">Select District</option>';
+
   for (let district in data) {
     districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
   }
@@ -134,6 +140,7 @@ function initializeDistricts() {
 function populateMandals() {
   const district = document.getElementById("districtSelect").value;
   const mandalSelect = document.getElementById("mandalSelect");
+
   mandalSelect.innerHTML = '<option value="">Select Mandal</option>';
   document.getElementById("villageSelect").innerHTML = '<option value="">Select Village</option>';
 
@@ -143,15 +150,29 @@ function populateMandals() {
     }
   }
 
-  document.getElementById("breadcrumbDistrict").textContent = district;
+  document.getElementById("breadcrumbDistrict").textContent = district || "-";
   document.getElementById("breadcrumbMandal").textContent = "-";
   document.getElementById("breadcrumbVillage").textContent = "-";
+  if (districtCoordinates[district] && map) {
+  const coords = districtCoordinates[district];
+
+  map.setView(coords, 10);
+
+  if (marker) {
+    map.removeLayer(marker);
+  }
+
+  marker = L.marker(coords).addTo(map)
+    .bindPopup(`${district} - Flood Monitoring Active`)
+    .openPopup();
+}
 }
 
 function populateVillages() {
   const district = document.getElementById("districtSelect").value;
   const mandal = document.getElementById("mandalSelect").value;
   const villageSelect = document.getElementById("villageSelect");
+
   villageSelect.innerHTML = '<option value="">Select Village</option>';
 
   if (district && mandal && data[district][mandal]) {
@@ -160,13 +181,13 @@ function populateVillages() {
     }
   }
 
-  document.getElementById("breadcrumbMandal").textContent = mandal;
+  document.getElementById("breadcrumbMandal").textContent = mandal || "-";
   document.getElementById("breadcrumbVillage").textContent = "-";
 }
 
 function updateBreadcrumbs() {
   const village = document.getElementById("villageSelect").value;
-  document.getElementById("breadcrumbVillage").textContent = village;
+  document.getElementById("breadcrumbVillage").textContent = village || "-";
 
   if (village && !simInterval) {
     startSimulation();
@@ -175,14 +196,34 @@ function updateBreadcrumbs() {
   }
 }
 
+const districtCoordinates = {
+  "Thiruvananthapuram": [8.5241, 76.9366],
+  "Kollam": [8.8932, 76.6141],
+  "Pathanamthitta": [9.2648, 76.7870],
+  "Alappuzha": [9.4981, 76.3388],
+  "Kottayam": [9.5916, 76.5222],
+  "Idukki": [9.8497, 76.9710],
+  "Ernakulam": [9.9816, 76.2999],
+  "Thrissur": [10.5276, 76.2144],
+  "Palakkad": [10.7867, 76.6548],
+  "Malappuram": [11.0510, 76.0711],
+  "Kozhikode": [11.2588, 75.7804],
+  "Wayanad": [11.6854, 76.1320],
+  "Kannur": [11.8745, 75.3704],
+  "Kasaragod": [12.4996, 74.9869]
+};
+
 // --- Simulator Logic ---
 function startSimulation() {
   const slider = document.getElementById("waterSlider");
+
   simInterval = setInterval(() => {
-    const value = Math.floor(Math.random() * 501);
-    slider.value = value;
-    updateWaterLevel(value);
-  }, 3000);
+    const change = Math.floor(Math.random() * 40) - 15;
+    currentLevel = Math.max(0, Math.min(500, currentLevel + change));
+
+    slider.value = currentLevel;
+    updateWaterLevel(currentLevel);
+  }, 2000);
 }
 
 function stopSimulation() {
@@ -203,14 +244,15 @@ function toggleSimulation(btn) {
 // --- Water Level Monitor ---
 function updateWaterLevel(value) {
   const fill = document.getElementById("gaugeFill");
-  const level = parseInt(value);
-  document.getElementById("waterValue").textContent = level;
-  fill.style.width = `${(level / 500) * 100}%`;
-
   const statusIndicator = document.getElementById("statusIndicator");
   const alertLog = document.getElementById("alertLog");
   const alertSound = document.getElementById("alertSound");
   const dangerSound = document.getElementById("dangerSound");
+
+  const level = parseInt(value);
+  document.getElementById("waterValue").textContent = level;
+
+  fill.style.width = `${(level / 500) * 100}%`;
 
   let status = "Safe";
   let bg = "#d4edda";
@@ -229,37 +271,41 @@ function updateWaterLevel(value) {
     alertSound.play();
   }
 
+  // Dynamic Gauge Color
+  if (level >= 400) {
+    fill.style.background = "linear-gradient(to right, #e74c3c, #c0392b)";
+  } else if (level >= 150) {
+    fill.style.background = "linear-gradient(to right, #f39c12, #e67e22)";
+  } else {
+    fill.style.background = "linear-gradient(to right, #27ae60, #2ecc71)";
+  }
+
   statusIndicator.textContent = `Status: ${status}`;
   statusIndicator.style.backgroundColor = bg;
   statusIndicator.style.color = color;
 
+  // Create Alert Log Entry
   const timestamp = new Date().toLocaleTimeString();
   const log = document.createElement("div");
   log.textContent = `[${timestamp}] ${status} at ${level} cm`;
+
+  log.style.background = bg;
+  log.style.color = color;
+
   alertLog.prepend(log);
 }
 
-// --- Real SMS Alert Placeholder (Replace with Twilio or Fast2SMS API) ---
+// --- SMS Placeholder ---
 function sendSMSAlert(message, level) {
-  const selectedPhone = users[0].phone; // Get logged-in phone or loop if multi-user
-  console.log(`📩 Sending SMS to ${selectedPhone}: ${message} | Water level: ${level}cm`);
-
-  // Real API example (pseudo):
-  // fetch('https://sms-api.com/send', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({
-  //     to: selectedPhone,
-  //     message: `${message} - Water level at ${level} cm`
-  //   })
-  // });
+  const selectedPhone = users[0].phone;
+  console.log(`Sending SMS to ${selectedPhone}: ${message} | Water level: ${level}cm`);
 }
 
 // --- Map Modal Zoom ---
 function openMapZoom() {
   const modal = document.getElementById("mapModal");
   const img = document.getElementById("mapZoomed");
-  img.src = "https://upload.wikimedia.org/wikipedia/commons/8/88/Kerala_District_map.svg";
+  img.src = "https://www.bing.com/images/search?view=detailV2&ccid=EVxEu7N2&id=7DB52A22521C598BC23445867D7A2BB5291D0446&thid=OIP.EVxEu7N2SNtbkBcSw22V2wHaMW&mediaurl=https%3A%2F%2Fth.bing.com%2Fth%2Fid%2FR.115c44bbb37648db5b901712c36d95db%3Frik%3DRgQdKbUren2GRQ%26riu%3Dhttp%253a%252f%252fwww.mapsofworld.com%252findia%252fkerala%252fkerala.jpg%26ehk%3DbS5cGcbm1A18bVqOMc%252bdqeeVZW5tzKri7kMBCvLKQAU%253d%26risl%3D%26pid%3DImgRaw%26r%3D0&exph=1334&expw=800&q=kerala+map&form=IRPRST&ck=FD21E3DEB595EB94D926B5C2DA80FD64&selectedindex=3&itb=0&cw=1719&ch=786&ajaxhist=0&ajaxserp=0&vt=0&sim=11";
   modal.style.display = "block";
 }
 
@@ -267,3 +313,31 @@ function closeMapZoom() {
   document.getElementById("mapModal").style.display = "none";
 }
 
+let map;
+let marker;
+
+// Initialize Map
+function initMap() {
+  map = L.map('map').setView([10.8505, 76.2711], 7);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+}
+
+// Call map after login
+function login() {
+  const phone = document.getElementById("phone").value.trim();
+  const error = document.getElementById("loginError");
+
+  const user = users.find(u => u.phone === phone);
+
+  if (user) {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+    initializeDistricts();
+    initMap();   // 👈 ADD THIS LINE
+  } else {
+    error.textContent = "Invalid phone number";
+  }
+}
