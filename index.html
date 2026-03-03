@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FloodGuard Kerala</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
   <div class="container">
@@ -15,6 +17,7 @@
       <input id="phone" type="text" placeholder="Enter Phone Number" />
       <button onclick="login()">Login</button>
       <div id="loginError"></div>
+      <p>Login With 6309808435</p>
     </div>
 
     <!-- Main App -->
@@ -77,10 +80,10 @@
         </div>
 
         <!-- Map Panel -->
-        <div class="card map-panel">
-          <h2>Kerala District Map</h2>
-          <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Kerala_District_map.svg" alt="Kerala Map" onclick="openMapZoom()" />
-        </div>
+       <div class="card map-panel">
+       <h2>Kerala Live Map</h2>
+       <div id="map"></div>
+       </div>
 
         <!-- About Section -->
         <div class="card about-panel">
